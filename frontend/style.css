@@ -27,6 +27,25 @@ section {
   box-shadow: 0 0 10px rgba(0,0,0,0.1);
 }
 
+/* Table for market stats */
+#marketStats table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 20px;
+}
+
+#marketStats th, #marketStats td {
+  border: 1px solid #ddd;
+  padding: 8px;
+  text-align: left;
+}
+
+#marketStats th {
+  background-color: #007bff;
+  color: white;
+}
+
+/* Form styles */
 input, textarea, select {
   width: 100%;
   padding: 8px;
@@ -44,7 +63,6 @@ button {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  font-weight: 600;
 }
 
 button:hover {
@@ -55,6 +73,7 @@ button:hover {
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
   position: relative;
+  margin-bottom: 10px;
 }
 
 .memo:last-child {
@@ -66,10 +85,11 @@ small {
   font-size: 0.9em;
 }
 
+/* Delete and edit buttons */
 .deleteBtn {
   position: absolute;
   top: 10px;
-  right: 10px;
+  right: 60px;
   background-color: #dc3545;
   padding: 5px 10px;
   font-size: 0.9em;
@@ -83,31 +103,43 @@ small {
   background-color: #a71d2a;
 }
 
-/* Nav button style */
-.nav-btn {
-  display: inline-block;
-  background-color: #1976d2;
-  color: white;
-  padding: 10px 20px;
-  text-decoration: none;
-  border-radius: 6px;
-  font-weight: 600;
-  margin-top: 20px;
-  text-align: center;
+.editBtn {
+  position: absolute;
+  top: 10px;
+  right: 120px;
+  background-color: #28a745;
+  padding: 5px 10px;
+  font-size: 0.9em;
+  border-radius: 4px;
+  border: none;
   cursor: pointer;
+  color: white;
 }
 
-.nav-btn:hover {
-  background-color: #1565c0;
+.editBtn:hover {
+  background-color: #1e7e34;
 }
 
-/* Status colors for markets page (optional) */
-.status-approved {
-  color: green;
-  font-weight: bold;
+/* Edit form container */
+.editFormContainer {
+  background: #f9f9f9;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  margin-top: 15px;
 }
 
-.status-pending {
-  color: orange;
-  font-weight: bold;
+.editForm input, 
+.editForm textarea,
+.editForm select {
+  width: 100%;
+  padding: 6px;
+  margin-top: 4px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #aaa;
+}
+
+.editForm button {
+  margin-right: 10px;
 }
