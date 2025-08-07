@@ -42,6 +42,24 @@ app.delete('/api/memos/:index', (req, res) => {
   res.json({ message: 'Memo deleted' });
 });
 
+// PATCH update memo status by index
+app.patch('/api/memos/:index', (req, res) => {
+  const index = parseInt(req.params.index, 10);
+  const { status } = req.body;
+  let memos = JSON.parse(fs.readFileSync(DATA_FILE));
+
+  if (index < 0 || index >= memos.length) {
+    return res.status(400).json({ message: 'Invalid memo index' });
+  }
+  if (!['Pending', 'Approved'].includes(status)) {
+    return res.status(400).json({ message: 'Invalid status value' });
+  }
+
+  memos[index].status = status;
+  fs.writeFileSync(DATA_FILE, JSON.stringify(memos, null, 2));
+  res.json({ message: 'Memo updated' });
+});
+
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../frontend/index.html'));
 });

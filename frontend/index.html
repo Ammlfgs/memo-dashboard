@@ -61,10 +61,16 @@
       memos.forEach((memo, index) => {
         const div = document.createElement('div');
         div.className = 'memo';
+
         div.innerHTML = `
-          <strong>${memo.title}</strong> <em>(${memo.status})</em><br>
-          <small>${memo.date} ${memo.time}</small>
+          <strong>${memo.title}</strong><br>
+          <small>${memo.date} ${memo.time}</small><br>
           <p>${memo.description}</p>
+          Status: 
+          <select class="statusSelect" data-index="${index}">
+            <option value="Pending" ${memo.status === 'Pending' ? 'selected' : ''}>Pending</option>
+            <option value="Approved" ${memo.status === 'Approved' ? 'selected' : ''}>Approved</option>
+          </select>
           <button class="deleteBtn" data-index="${index}">Delete</button>
         `;
         memosContainer.appendChild(div);
@@ -78,6 +84,20 @@
             await fetch(`/api/memos/${idx}`, { method: 'DELETE' });
             loadMemos();
           }
+        });
+      });
+
+      // Attach status change handlers
+      document.querySelectorAll('.statusSelect').forEach(select => {
+        select.addEventListener('change', async (e) => {
+          const idx = e.target.getAttribute('data-index');
+          const newStatus = e.target.value;
+          await fetch(`/api/memos/${idx}`, {
+            method: 'PATCH',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({ status: newStatus })
+          });
+          loadMemos();
         });
       });
     }
