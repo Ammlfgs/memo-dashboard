@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Market Memos Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+  <style>
+    /* Additional inline styles for markets page */
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef2f7;
+      margin: 30px;
+      color: #222;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #444;
+    }
+    table {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      overflow: hidden;
+    }
+    th, td {
+      padding: 14px 20px;
+      border-bottom: 1px solid #ddd;
+      text-align: center;
+      font-weight: 600;
+    }
+    th {
+      background-color: #1976d2;
+      color: white;
+      font-size: 1.1em;
+    }
+    tr:hover {
+      background-color: #f1f9ff;
+    }
+    .status-approved {
+      color: green;
+      font-weight: bold;
+    }
+    .status-pending {
+      color: orange;
+      font-weight: bold;
+    }
+    .nav-btn {
+      display: block;
+      width: 180px;
+      margin: 20px auto 40px auto;
+      padding: 12px 0;
+      background-color: #1976d2;
+      color: white;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 6px;
+      text-decoration: none;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
+      transition: background-color 0.3s ease;
+    }
+    .nav-btn:hover {
+      background-color: #1565c0;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>📊 Memos by Market</h1>
+
+  <a href="/" class="nav-btn">← Back to Main Dashboard</a>
+
+  <table id="marketTable">
+    <thead>
+      <tr>
+        <th>Market</th>
+        <th>Total Memos</th>
+        <th class="status-approved">Approved</th>
+        <th class="status-pending">Pending</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- Data loads here -->
+    </tbody>
+  </table>
+
+  <script>
+    async function loadMarketData() {
+      const res = await fetch('/api/markets/counts');
+      const data = await res.json();
+
+      const tbody = document.querySelector('#marketTable tbody');
+      tbody.innerHTML = '';
+
+      for (const [market, counts] of Object.entries(data)) {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${market}</td>
+          <td>${counts.total}</td>
+          <td class="status-approved">${counts.approved}</td>
+          <td class="status-pending">${counts.pending}</td>
+        `;
+        tbody.appendChild(row);
+      }
+    }
+
+    loadMarketData();
+  </script>
+
+</body>
+</html>

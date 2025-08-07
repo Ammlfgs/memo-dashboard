@@ -35,6 +35,26 @@
           <option value="Approved">Approved</option>
         </select>
       </label><br /><br />
+      <label>Market:<br />
+        <select id="market" required>
+          <option value="">--Select Market--</option>
+          <option>Apo ZoneA</option>
+          <option>Area1 shopping complex</option>
+          <option>Area 2 shopping complex</option>
+          <option>Area 10 market</option>
+          <option>Area 3 market</option>
+          <option>Dei Dei Markets</option>
+          <option>Garki International Market</option>
+          <option>Garki Model Market</option>
+          <option>Gudu Market</option>
+          <option>Head Office</option>
+          <option>Kado Fish Market</option>
+          <option>Kaura Market</option>
+          <option>Maitama Farmers Market</option>
+          <option>Wuse Market</option>
+          <option>Zone 3 neighnourhood center</option>
+        </select>
+      </label><br /><br />
       <button type="submit">Add Memo</button>
     </form>
   </section>
@@ -42,6 +62,10 @@
   <section>
     <h2>📁 All Memos</h2>
     <div id="memosContainer"></div>
+  </section>
+
+  <section>
+    <a href="markets.html" class="nav-btn">View Memos by Market →</a>
   </section>
 
   <script>
@@ -61,16 +85,10 @@
       memos.forEach((memo, index) => {
         const div = document.createElement('div');
         div.className = 'memo';
-
         div.innerHTML = `
-          <strong>${memo.title}</strong><br>
-          <small>${memo.date} ${memo.time}</small><br>
+          <strong>${memo.title}</strong> <em>(${memo.status})</em><br>
+          <small>${memo.date} ${memo.time} | Market: ${memo.market}</small>
           <p>${memo.description}</p>
-          Status: 
-          <select class="statusSelect" data-index="${index}">
-            <option value="Pending" ${memo.status === 'Pending' ? 'selected' : ''}>Pending</option>
-            <option value="Approved" ${memo.status === 'Approved' ? 'selected' : ''}>Approved</option>
-          </select>
           <button class="deleteBtn" data-index="${index}">Delete</button>
         `;
         memosContainer.appendChild(div);
@@ -86,20 +104,6 @@
           }
         });
       });
-
-      // Attach status change handlers
-      document.querySelectorAll('.statusSelect').forEach(select => {
-        select.addEventListener('change', async (e) => {
-          const idx = e.target.getAttribute('data-index');
-          const newStatus = e.target.value;
-          await fetch(`/api/memos/${idx}`, {
-            method: 'PATCH',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ status: newStatus })
-          });
-          loadMemos();
-        });
-      });
     }
 
     form.addEventListener('submit', async e => {
@@ -109,10 +113,11 @@
         description: document.getElementById('description').value.trim(),
         date: document.getElementById('date').value,
         time: document.getElementById('time').value,
-        status: document.getElementById('status').value
+        status: document.getElementById('status').value,
+        market: document.getElementById('market').value
       };
 
-      if (!newMemo.title || !newMemo.description || !newMemo.date || !newMemo.time) return;
+      if (!newMemo.title || !newMemo.description || !newMemo.date || !newMemo.time || !newMemo.market) return alert('Please fill all fields!');
 
       await fetch('/api/memos', {
         method: 'POST',
