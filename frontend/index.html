@@ -13,12 +13,7 @@
     <img src="logo.png" alt="Company Logo" id="companyLogo" />
   </header>
 
-  <h1>Amml Facility Memos</h1>
-
-  <!-- Navigation to Records Page -->
-  <button onclick="window.location.href='records.html'" style="margin-bottom: 20px;">
-    View Market Records
-  </button>
+  <h1>📄 Company Memo Dashboard</h1>
 
   <section>
     <h2>📊 Memo Statistics</h2>
@@ -38,7 +33,6 @@
         <select id="status">
           <option value="Pending">Pending</option>
           <option value="Approved">Approved</option>
-          <option value="Paid">Paid</option>
         </select>
       </label><br /><br />
       <button type="submit">Add Memo</button>
@@ -76,7 +70,7 @@
         memosContainer.appendChild(div);
       });
 
-      // Delete functionality
+      // Attach delete handlers
       document.querySelectorAll('.deleteBtn').forEach(button => {
         button.addEventListener('click', async (e) => {
           const idx = e.target.getAttribute('data-index');
