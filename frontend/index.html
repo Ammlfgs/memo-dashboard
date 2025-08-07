@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Company Memo Dashboard</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Company Logo -->
+  <header>
+    <img src="logo.png" alt="Company Logo" id="companyLogo" />
+  </header>
+
+  <h1> Amml Facility Memos</h1>
+
+  <section>
+    <h2>📊 Memo Statistics</h2>
+    <p>Total Memos: <span id="total">0</span></p>
+    <p>Pending: <span id="pending">0</span></p>
+    <p>Approved: <span id="approved">0</span></p>
+  </section>
+
+  <section>
+    <h2>➕ Add Memo</h2>
+    <form id="memoForm">
+      <label>Title:<br /><input type="text" id="title" required /></label><br /><br />
+      <label>Description:<br /><textarea id="description" required></textarea></label><br /><br />
+      <label>Date:<br /><input type="date" id="date" required /></label><br /><br />
+      <label>Time:<br /><input type="time" id="time" required /></label><br /><br />
+      <label>Status:<br />
+        <select id="status">
+          <option value="Pending">Pending</option>
+          <option value="Approved">Approved</option>
+        </select>
+      </label><br /><br />
+      <button type="submit">Add Memo</button>
+    </form>
+  </section>
+
+  <section>
+    <h2>📁 All Memos</h2>
+    <div id="memosContainer"></div>
+  </section>
+
+  <script>
+    const form = document.getElementById('memoForm');
+    const memosContainer = document.getElementById('memosContainer');
+
+    async function loadMemos() {
+      const response = await fetch('/api/memos');
+      const memos = await response.json();
+
+      document.getElementById('total').textContent = memos.length;
+      document.getElementById('pending').textContent = memos.filter(m => m.status === 'Pending').length;
+      document.getElementById('approved').textContent = memos.filter(m => m.status === 'Approved').length;
+
+      memosContainer.innerHTML = '';
+
+      memos.forEach((memo, index) => {
+        const div = document.createElement('div');
+        div.className = 'memo';
+        div.innerHTML = `
+          <strong>${memo.title}</strong> <em>(${memo.status})</em><br>
+          <small>${memo.date} ${memo.time}</small>
+          <p>${memo.description}</p>
+          <button class="deleteBtn" data-index="${index}">Delete</button>
+        `;
+        memosContainer.appendChild(div);
+      });
+
+      // Attach delete handlers
+      document.querySelectorAll('.deleteBtn').forEach(button => {
+        button.addEventListener('click', async (e) => {
+          const idx = e.target.getAttribute('data-index');
+          if (confirm('Are you sure you want to delete this memo?')) {
+            await fetch(`/api/memos/${idx}`, { method: 'DELETE' });
+            loadMemos();
+          }
+        });
+      });
+    }
+
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const newMemo = {
+        title: document.getElementById('title').value.trim(),
+        description: document.getElementById('description').value.trim(),
+        date: document.getElementById('date').value,
+        time: document.getElementById('time').value,
+        status: document.getElementById('status').value
+      };
+
+      if (!newMemo.title || !newMemo.description || !newMemo.date || !newMemo.time) return;
+
+      await fetch('/api/memos', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newMemo)
+      });
+
+      form.reset();
+      loadMemos();
+    });
+
+    loadMemos();
+  </script>
+
+</body>
+</html>

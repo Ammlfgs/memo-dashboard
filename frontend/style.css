@@ -1,0 +1,83 @@
+body {
+  font-family: Arial, sans-serif;
+  background-color: #f9f9f9;
+  margin: 20px;
+  color: #333;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+#companyLogo {
+  max-width: 200px;
+  height: auto;
+}
+
+h1, h2 {
+  color: #222;
+}
+
+section {
+  background: #fff;
+  padding: 20px;
+  margin-top: 20px;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+input, textarea, select {
+  width: 100%;
+  padding: 8px;
+  margin-top: 5px;
+  box-sizing: border-box;
+  border-radius: 4px;
+  border: 1px solid #ccc;
+}
+
+button {
+  margin-top: 15px;
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.memo {
+  border-bottom: 1px solid #ddd;
+  padding: 10px 0;
+  position: relative;
+}
+
+.memo:last-child {
+  border-bottom: none;
+}
+
+small {
+  color: #666;
+  font-size: 0.9em;
+}
+
+.deleteBtn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background-color: #dc3545;
+  padding: 5px 10px;
+  font-size: 0.9em;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  color: white;
+}
+
+.deleteBtn:hover {
+  background-color: #a71d2a;
+}
