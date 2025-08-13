@@ -1,243 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>AMML Memo Dashboard</title>
-<link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMML Memo Dashboard - Login</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Segoe UI", Tahoma, sans-serif;
+      background: linear-gradient(135deg, #4e73df, #224abe);
+      height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .login-container {
+      background: white;
+      padding: 2rem;
+      border-radius: 15px;
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+      width: 350px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .logo {
+      display: block;
+      margin: 0 auto 15px;
+      width: 80px;
+      height: 80px;
+      object-fit: contain;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.5rem;
+      color: #224abe;
+      margin-bottom: 1.5rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 600;
+      color: #333;
+    }
+
+    input {
+      width: 100%;
+      padding: 0.7rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+      font-size: 0.95rem;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #4e73df;
+      box-shadow: 0 0 4px rgba(78, 115, 223, 0.5);
+    }
+
+    button {
+      width: 100%;
+      padding: 0.75rem;
+      background: #4e73df;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    button:hover {
+      background: #224abe;
+    }
+
+    #errorMsg {
+      color: red;
+      font-size: 0.85rem;
+      margin-top: -0.5rem;
+      margin-bottom: 1rem;
+      text-align: center;
+    }
+  </style>
 </head>
 <body>
-<div class="page">
-  <header>
-    <img src="logo.png" id="companyLogo" alt="Company Logo"/>
-    <h1>AMML Memo Dashboard</h1>
-  </header>
+  <div class="login-container">
+    <img src="logo.png" alt="Company Logo" class="logo">
+    <h1>AMML Dashboard</h1>
 
-  <main>
-    <section class="card stats">
-      <h2>📊 Overall Memo Statistics</h2>
-      <div class="stats-grid">
-        <div class="stat-card">
-          <div class="stat-num" id="total">0</div>
-          <div class="stat-label">Total</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="approved">0</div>
-          <div class="stat-label">Approved</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-num" id="pending">0</div>
-          <div class="stat-label">Pending</div>
-        </div>
-      </div>
-    </section>
+    <form id="loginForm" autocomplete="off">
+      <label for="username">Username</label>
+      <input type="text" id="username" required>
 
-    <section class="card market-stats">
-      <h2>📍 Memo Statistics by Market</h2>
-      <div id="marketStats"></div>
-    </section>
+      <label for="password">Password</label>
+      <input type="password" id="password" required>
 
-    <section class="card add-memo">
-      <h2>➕ Add Memo</h2>
-      <form id="memoForm" autocomplete="off">
-        <label>Title <input type="text" id="title" required/></label>
-        <label>Description <textarea id="description" rows="3" required></textarea></label>
-        <div class="row">
-          <label>Date <input type="date" id="date" required/></label>
-          <label>Time <input type="time" id="time" required/></label>
-        </div>
-        <label>Status
-          <select id="status">
-            <option>Pending</option>
-            <option>Approved</option>
-          </select>
-        </label>
-        <label>Direction
-          <select id="direction">
-            <option>Incoming</option>
-            <option>Outgoing</option>
-          </select>
-        </label>
-        <label>Market
-          <select id="market" required>
-            <option value="">-- Select Market --</option>
-            <option>Apo ZoneA</option>
-            <option>Area1 shopping complex</option>
-            <option>Area 2 shopping complex</option>
-            <option>Area 10 market</option>
-            <option>Area 3 market</option>
-            <option>Dei Dei Markets</option>
-            <option>Garki International Market</option>
-            <option>Garki Model Market</option>
-            <option>Gudu Market</option>
-            <option>Head Office</option>
-            <option>Kado Fish Market</option>
-            <option>Kaura Market</option>
-            <option>Maitama Farmers Market</option>
-            <option>Wuse Market</option>
-            <option>Zone 3 neighnourhood center</option>
-          </select>
-        </label>
-        <div class="form-actions"><button type="submit" class="primary">Add Memo</button></div>
-      </form>
-    </section>
+      <p id="errorMsg"></p>
 
-    <section class="card memos-list">
-      <h2>📁 All Memos</h2>
-      <div id="memosContainer"></div>
-    </section>
-  </main>
-</div>
+      <button type="submit">Login</button>
+    </form>
+  </div>
 
-<script>
-const MARKETS=[
-  "Apo ZoneA","Area1 shopping complex","Area 2 shopping complex","Area 10 market",
-  "Area 3 market","Dei Dei Markets","Garki International Market","Garki Model Market",
-  "Gudu Market","Head Office","Kado Fish Market","Kaura Market","Maitama Farmers Market",
-  "Wuse Market","Zone 3 neighnourhood center"
-];
+  <script>
+    const loginForm = document.getElementById('loginForm');
+    const errorMsg = document.getElementById('errorMsg');
 
-const form=document.getElementById('memoForm');
-const memosContainer=document.getElementById('memosContainer');
-const marketStatsDiv=document.getElementById('marketStats');
+    const CREDENTIALS = {
+      username: 'admin',
+      password: 'password123'
+    };
 
-function escapeHtml(s){if(s==null) return'';return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
-function escapeAttr(s){if(s==null)return'';return String(s).replace(/"/g,'&quot;');}
-function nl2br(s){return s.replace(/\n/g,'<br/>');}
-
-async function fetchMemos(){const res=await fetch('/api/memos');if(!res.ok)throw new Error('Failed to load memos');return res.json();}
-
-async function loadAll(){
-  const memos=await fetchMemos();
-
-  // overall stats
-  document.getElementById('total').textContent=memos.length;
-  document.getElementById('approved').textContent=memos.filter(m=>m.status==='Approved').length;
-  document.getElementById('pending').textContent=memos.filter(m=>m.status==='Pending').length;
-
-  // market stats
-  let html='<table class="market-table"><thead><tr><th>Market</th><th>Total</th><th>Approved</th><th>Pending</th></tr></thead><tbody>';
-  MARKETS.forEach(m=>{
-    const arr=memos.filter(x=>x.market===m);
-    html+=`<tr><td>${m}</td><td>${arr.length}</td><td>${arr.filter(x=>x.status==='Approved').length}</td><td>${arr.filter(x=>x.status==='Pending').length}</td></tr>`;
-  });
-  html+='</tbody></table>'; marketStatsDiv.innerHTML=html;
-
-  // memos list
-  memosContainer.innerHTML='';
-  if(memos.length===0){memosContainer.innerHTML='<p class="muted">No memos yet.</p>';return;}
-  memos.forEach(memo=>{
-    const badgeClass=memo.direction==='Incoming'?'badge incoming':'badge outgoing';
-    const memoHtml=`
-      <div class="memo-item">
-        <div class="memo-left">
-          <div class="memo-title">${escapeHtml(memo.title)} <span class="${badgeClass}">${escapeHtml(memo.direction)}</span></div>
-          <div class="memo-meta"><small>${escapeHtml(memo.date)} ${escapeHtml(memo.time)} • ${escapeHtml(memo.market)} • ${escapeHtml(memo.status)}</small></div>
-          <div class="memo-body">${nl2br(escapeHtml(memo.description))}</div>
-        </div>
-        <div class="memo-actions">
-          <button class="btn edit" data-id="${memo.id}">Edit</button>
-          <button class="btn delete" data-id="${memo.id}">Delete</button>
-        </div>
-        <div class="edit-wrap" data-id="${memo.id}" style="display:none">
-          <form class="edit-form" data-id="${memo.id}">
-            <label>Title <input name="title" value="${escapeAttr(memo.title)}" required/></label>
-            <label>Description <textarea name="description" rows="3" required>${escapeAttr(memo.description)}</textarea></label>
-            <div class="row">
-              <label>Date <input type="date" name="date" value="${escapeAttr(memo.date)}" required/></label>
-              <label>Time <input type="time" name="time" value="${escapeAttr(memo.time)}" required/></label>
-            </div>
-            <label>Status
-              <select name="status">
-                <option ${memo.status==='Pending'?'selected':''}>Pending</option>
-                <option ${memo.status==='Approved'?'selected':''}>Approved</option>
-              </select>
-            </label>
-            <label>Direction
-              <select name="direction">
-                <option ${memo.direction==='Incoming'?'selected':''}>Incoming</option>
-                <option ${memo.direction==='Outgoing'?'selected':''}>Outgoing</option>
-              </select>
-            </label>
-            <label>Market
-              <select name="market">${MARKETS.map(m=>`<option value="${escapeAttr(m)}" ${memo.market===m?'selected':''}>${escapeHtml(m)}</option>`).join('')}</select>
-            </label>
-            <div class="form-actions">
-              <button type="submit" class="primary small">Save</button>
-              <button type="button" class="cancel-edit">Cancel</button>
-            </div>
-          </form>
-        </div>
-      </div>
-    `;
-    memosContainer.insertAdjacentHTML('beforeend',memoHtml);
-  });
-
-  // delete/edit buttons
-  document.querySelectorAll('.btn.delete').forEach(btn=>{
-    btn.addEventListener('click',async e=>{
-      const id=e.currentTarget.dataset.id;
-      if(!confirm('Delete this memo?')) return;
-      const r=await fetch(`/api/memos/${id}`,{method:'DELETE'});
-      if(r.ok) loadAll(); else alert('Failed to delete');
-    });
-  });
-  document.querySelectorAll('.btn.edit').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      const id=e.currentTarget.dataset.id;
-      document.querySelectorAll('.edit-wrap').forEach(w=>w.style.display='none');
-      const wrap=document.querySelector(`.edit-wrap[data-id="${id}"]`);
-      if(wrap) wrap.style.display='block';
-      wrap.scrollIntoView({behavior:'smooth',block:'nearest'});
-    });
-  });
-  document.querySelectorAll('.cancel-edit').forEach(btn=>{
-    btn.addEventListener('click',e=>{
-      const wrap=e.currentTarget.closest('.edit-wrap');
-      if(wrap) wrap.style.display='none';
-    });
-  });
-  document.querySelectorAll('.edit-form').forEach(frm=>{
-    frm.addEventListener('submit',async e=>{
+    loginForm.addEventListener('submit', e => {
       e.preventDefault();
-      const id=frm.dataset.id;
-      const formData=new FormData(frm);
-      const payload={
-        title:formData.get('title').trim(),
-        description:formData.get('description').trim(),
-        date:formData.get('date'),
-        time:formData.get('time'),
-        status:formData.get('status'),
-        market:formData.get('market'),
-        direction:formData.get('direction')
-      };
-      if(!payload.title||!payload.description||!payload.date||!payload.time||!payload.status||!payload.market||!payload.direction)
-        return alert('Please fill all fields');
-      const r=await fetch(`/api/memos/${id}`,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      if(r.ok) loadAll(); else {const j=await r.json().catch(()=>({}));alert('Update failed: '+(j.message||r.statusText));}
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value;
+
+      if (username === CREDENTIALS.username && password === CREDENTIALS.password) {
+        const sessionId = 'sess-' + Date.now() + '-' + Math.floor(Math.random() * 1000000);
+        localStorage.setItem('sessionId', sessionId);
+        window.location.href = 'index.html';
+      } else {
+        errorMsg.textContent = 'Invalid username or password';
+      }
     });
-  });
-}
-
-// add memo form
-form.addEventListener('submit',async e=>{
-  e.preventDefault();
-  const payload={
-    title:document.getElementById('title').value.trim(),
-    description:document.getElementById('description').value.trim(),
-    date:document.getElementById('date').value,
-    time:document.getElementById('time').value,
-    status:document.getElementById('status').value,
-    direction:document.getElementById('direction').value,
-    market:document.getElementById('market').value
-  };
-  if(!payload.title||!payload.description||!payload.date||!payload.time||!payload.status||!payload.direction||!payload.market)
-    return alert('Please fill all fields.');
-  const r=await fetch('/api/memos',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-  if(r.ok){form.reset();loadAll();} else {const j=await r.json().catch(()=>({}));alert('Failed to add memo: '+(j.message||r.statusText));}
-});
-
-loadAll().catch(err=>{console.error(err);memosContainer.innerHTML='<p class="muted">Failed to load memos.</p>';});
-</script>
+  </script>
 </body>
 </html>
