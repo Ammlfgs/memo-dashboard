@@ -1,97 +1,85 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>AMML Memo Dashboard - Market Statistics</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <title>Memo Counts by Market</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="/style.css" />
   <style>
-    .market-page { max-width: 1000px; margin: 28px auto; padding: 12px; }
-    h1 { text-align: center; color: #224abe; margin-bottom: 18px; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
-    th { background: #4e73df; color: white; font-weight: 600; }
-    td.approved { color: #28a745; font-weight: 600; }
-    td.pending { color: #dc3545; font-weight: 600; }
-    td.incoming { color: #1976d2; font-weight: 600; }
-    td.outgoing { color: #ff9900; font-weight: 600; }
-    .back-btn { display: inline-block; margin-top: 20px; padding: 10px 16px; background: #4e73df; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; }
-    .back-btn:hover { background: #224abe; }
+    main {
+      margin-top: 20px;
+    }
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      box-shadow: 0 2px 5px rgb(0 0 0 / 0.1);
+    }
+    th, td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #ddd;
+      text-align: left;
+    }
+    th {
+      background-color: #007bff;
+      color: white;
+    }
+    tbody tr:hover {
+      background-color: #f1f1f1;
+    }
+    header nav a {
+      margin-left: 20px;
+    }
   </style>
 </head>
 <body>
-  <div class="market-page">
-    <h1>📍 Market Memo Statistics</h1>
-    <table id="marketTable">
+  <header>
+    <img src="/logo.png" alt="Company Logo" id="companyLogo" />
+    <h1>Memo Counts by Market</h1>
+    <nav>
+      <a href="/">← Back to Dashboard</a>
+    </nav>
+  </header>
+
+  <main>
+    <table id="marketsTable" aria-label="Memo counts by market">
       <thead>
         <tr>
           <th>Market</th>
-          <th>Total</th>
-          <th>Approved</th>
-          <th>Pending</th>
-          <th>Incoming</th>
-          <th>Outgoing</th>
+          <th>Number of Memos</th>
         </tr>
       </thead>
       <tbody>
-        <!-- Market rows will be injected here -->
+        <!-- Market counts will load here -->
       </tbody>
     </table>
-    <a href="index.html" class="back-btn">← Back to Dashboard</a>
-  </div>
+  </main>
 
   <script>
-    const MARKETS = [
-      "Apo ZoneA",
-      "Area1 shopping complex",
-      "Area 2 shopping complex",
-      "Area 10 market",
-      "Area 3 market",
-      "Dei Dei Markets",
-      "Garki International Market",
-      "Garki Model Market",
-      "Gudu Market",
-      "Head Office",
-      "Kado Fish Market",
-      "Kaura Market",
-      "Maitama Farmers Market",
-      "Wuse Market",
-      "Zone 3 neighnourhood center"
-    ];
+    async function fetchMarketCounts() {
+      try {
+        const response = await fetch('/api/markets');
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        const counts = await response.json();
 
-    async function loadMarketStats() {
-      const res = await fetch('/api/memos');
-      if (!res.ok) return alert('Failed to load memos.');
-      const memos = await res.json();
+        const tbody = document.querySelector('#marketsTable tbody');
+        tbody.innerHTML = '';
 
-      const tbody = document.querySelector('#marketTable tbody');
-      tbody.innerHTML = '';
-
-      MARKETS.forEach(market => {
-        const arr = memos.filter(m => m.market === market);
-        const approved = arr.filter(m => m.status === 'Approved').length;
-        const pending = arr.filter(m => m.status === 'Pending').length;
-        const incoming = arr.filter(m => m.direction === 'Incoming').length;
-        const outgoing = arr.filter(m => m.direction === 'Outgoing').length;
-
-        const row = document.createElement('tr');
-        row.innerHTML = `
-          <td>${market}</td>
-          <td>${arr.length}</td>
-          <td class="approved">${approved}</td>
-          <td class="pending">${pending}</td>
-          <td class="incoming">${incoming}</td>
-          <td class="outgoing">${outgoing}</td>
-        `;
-        tbody.appendChild(row);
-      });
+        for (const [market, count] of Object.entries(counts)) {
+          const row = document.createElement('tr');
+          row.innerHTML = `<td>${market}</td><td>${count}</td>`;
+          tbody.appendChild(row);
+        }
+      } catch (error) {
+        console.error('Failed to fetch market counts:', error);
+        const tbody = document.querySelector('#marketsTable tbody');
+        tbody.innerHTML = `<tr><td colspan="2" style="color:red;">Failed to load data.</td></tr>`;
+      }
     }
 
-    // check for session
-    const sessionId = localStorage.getItem('sessionId');
-    if (!sessionId) window.location.href = 'login.html';
-
-    loadMarketStats();
+    fetchMarketCounts();
   </script>
 </body>
 </html>
