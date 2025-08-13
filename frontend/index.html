@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -11,11 +10,11 @@
   <div class="page">
     <header>
       <img src="logo.png" id="companyLogo" alt="Company Logo" />
-      <h1> AMML Memo Dashboard</h1>
-      <button id="logoutBtn" class="primary small" style="margin-top:10px;">Logout</button>
+      <h1>AMML Memo Dashboard</h1>
     </header>
 
     <main>
+      <!-- Overall Stats -->
       <section class="card stats">
         <h2>📊 Overall Memo Statistics</h2>
         <div class="stats-grid">
@@ -34,23 +33,23 @@
         </div>
       </section>
 
+      <!-- Market Stats -->
       <section class="card market-stats">
-        <h2>📍 Memo Statistics by Market</h2>
+        <h2>📍 Market Memo Statistics</h2>
         <div id="marketStats"></div>
         <a class="nav-btn" href="markets.html">Open Market Summary Page →</a>
       </section>
 
+      <!-- Add Memo Form -->
       <section class="card add-memo">
         <h2>➕ Add Memo</h2>
         <form id="memoForm" autocomplete="off">
           <label>Title
             <input type="text" id="title" required />
           </label>
-
           <label>Description
             <textarea id="description" rows="3" required></textarea>
           </label>
-
           <div class="row">
             <label>Date
               <input type="date" id="date" required />
@@ -59,21 +58,18 @@
               <input type="time" id="time" required />
             </label>
           </div>
-
           <label>Status
             <select id="status">
               <option>Pending</option>
               <option>Approved</option>
             </select>
           </label>
-
           <label>Direction
             <select id="direction">
               <option>Incoming</option>
               <option>Outgoing</option>
             </select>
           </label>
-
           <label>Market
             <select id="market" required>
               <option value="">-- Select Market --</option>
@@ -94,44 +90,30 @@
               <option>Zone 3 neighnourhood center</option>
             </select>
           </label>
-
           <div class="form-actions">
             <button type="submit" class="primary">Add Memo</button>
           </div>
         </form>
       </section>
 
+      <!-- Memo List -->
       <section class="card memos-list">
-        <h2>📁 All Memos </h2>
+        <h2>📁 All Memos</h2>
         <div id="memosContainer"></div>
       </section>
     </main>
   </div>
 
   <script>
-    // Redirect to login if session invalid
-    async function checkSession() {
-      const res = await fetch('/api/memos');
-      if (res.status === 401) window.location.href='login.html';
-    }
-    checkSession().catch(()=>{ window.location.href='login.html'; });
+    // Helper: escape HTML
+    function escapeHtml(s) { if (!s) return ''; return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+    function escapeAttr(s) { if (!s) return ''; return String(s).replace(/"/g, '&quot;'); }
+    function nl2br(s){ return s.replace(/\n/g,'<br/>'); }
 
     const MARKETS = [
-      "Apo ZoneA",
-      "Area1 shopping complex",
-      "Area 2 shopping complex",
-      "Area 10 market",
-      "Area 3 market",
-      "Dei Dei Markets",
-      "Garki International Market",
-      "Garki Model Market",
-      "Gudu Market",
-      "Head Office",
-      "Kado Fish Market",
-      "Kaura Market",
-      "Maitama Farmers Market",
-      "Wuse Market",
-      "Zone 3 neighnourhood center"
+      "Apo ZoneA","Area1 shopping complex","Area 2 shopping complex","Area 10 market","Area 3 market",
+      "Dei Dei Markets","Garki International Market","Garki Model Market","Gudu Market","Head Office",
+      "Kado Fish Market","Kaura Market","Maitama Farmers Market","Wuse Market","Zone 3 neighnourhood center"
     ];
 
     const form = document.getElementById('memoForm');
@@ -149,27 +131,30 @@
 
       // Overall stats
       document.getElementById('total').textContent = memos.length;
-      document.getElementById('approved').textContent = memos.filter(m => m.status === 'Approved').length;
-      document.getElementById('pending').textContent = memos.filter(m => m.status === 'Pending').length;
+      document.getElementById('approved').textContent = memos.filter(m => m.status==='Approved').length;
+      document.getElementById('pending').textContent = memos.filter(m => m.status==='Pending').length;
 
       // Market stats
-      let html = '<table class="market-table"><thead><tr><th>Market</th><th>Total</th><th>Approved</th><th>Pending</th></tr></thead><tbody>';
-      MARKETS.forEach(market => {
-        const arr = memos.filter(x => x.market === market);
-        html += `<tr><td>${market}</td><td>${arr.length}</td><td class="approved">${arr.filter(x => x.status === 'Approved').length}</td><td class="pending">${arr.filter(x => x.status === 'Pending').length}</td></tr>`;
+      let html = '<table class="market-table"><thead><tr><th>Market</th><th>Total</th><th>Approved</th><th>Pending</th><th>Incoming</th><th>Outgoing</th></tr></thead><tbody>';
+      MARKETS.forEach(market=>{
+        const arr = memos.filter(x => x.market===market);
+        html += `<tr><td>${market}</td>
+          <td>${arr.length}</td>
+          <td class="approved">${arr.filter(x=>x.status==='Approved').length}</td>
+          <td class="pending">${arr.filter(x=>x.status==='Pending').length}</td>
+          <td class="incoming">${arr.filter(x=>x.direction==='Incoming').length}</td>
+          <td class="outgoing">${arr.filter(x=>x.direction==='Outgoing').length}</td>
+        </tr>`;
       });
-      html += '</tbody></table>';
+      html+='</tbody></table>';
       marketStatsDiv.innerHTML = html;
 
       // Memos list (newest first)
       memosContainer.innerHTML = '';
-      if (memos.length === 0) {
-        memosContainer.innerHTML = '<p class="muted">No memos yet.</p>';
-        return;
-      }
+      if (memos.length===0) { memosContainer.innerHTML='<p class="muted">No memos yet.</p>'; return; }
 
       memos.forEach(memo => {
-        const badgeClass = memo.direction === 'Incoming' ? 'badge incoming' : 'badge outgoing';
+        const badgeClass = memo.direction==='Incoming'?'badge incoming':'badge outgoing';
         const memoHtml = `
           <div class="memo-item">
             <div class="memo-left">
@@ -181,6 +166,7 @@
               <button class="btn edit" data-id="${memo.id}">Edit</button>
               <button class="btn delete" data-id="${memo.id}">Delete</button>
             </div>
+
             <div class="edit-wrap" data-id="${memo.id}" style="display:none">
               <form class="edit-form" data-id="${memo.id}">
                 <label>Title <input name="title" value="${escapeAttr(memo.title)}" required /></label>
@@ -215,36 +201,35 @@
         memosContainer.insertAdjacentHTML('beforeend', memoHtml);
       });
 
-      // Edit/Delete buttons
+      // Edit/Delete functionality
       document.querySelectorAll('.btn.delete').forEach(btn => {
-        btn.addEventListener('click', async e => {
+        btn.addEventListener('click', async e=>{
           const id = e.currentTarget.dataset.id;
-          if (!confirm('Delete this memo?')) return;
-          const r = await fetch(`/api/memos/${id}`, { method: 'DELETE' });
-          if (r.ok) loadAll();
-          else alert('Failed to delete');
+          if(!confirm('Delete this memo?')) return;
+          const r = await fetch(`/api/memos/${id}`,{method:'DELETE'});
+          if(r.ok) loadAll(); else alert('Failed to delete');
         });
       });
 
       document.querySelectorAll('.btn.edit').forEach(btn => {
-        btn.addEventListener('click', e => {
+        btn.addEventListener('click', e=>{
           const id = e.currentTarget.dataset.id;
-          document.querySelectorAll('.edit-wrap').forEach(w => w.style.display = 'none');
+          document.querySelectorAll('.edit-wrap').forEach(w=>w.style.display='none');
           const wrap = document.querySelector(`.edit-wrap[data-id="${id}"]`);
-          if (wrap) wrap.style.display = 'block';
-          wrap.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+          if(wrap) wrap.style.display='block';
+          wrap.scrollIntoView({behavior:'smooth', block:'nearest'});
         });
       });
 
-      document.querySelectorAll('.cancel-edit').forEach(btn => {
-        btn.addEventListener('click', e => {
+      document.querySelectorAll('.cancel-edit').forEach(btn=>{
+        btn.addEventListener('click', e=>{
           const wrap = e.currentTarget.closest('.edit-wrap');
-          if (wrap) wrap.style.display = 'none';
+          if(wrap) wrap.style.display='none';
         });
       });
 
-      document.querySelectorAll('.edit-form').forEach(frm => {
-        frm.addEventListener('submit', async e => {
+      document.querySelectorAll('.edit-form').forEach(frm=>{
+        frm.addEventListener('submit', async e=>{
           e.preventDefault();
           const id = frm.dataset.id;
           const formData = new FormData(frm);
@@ -257,28 +242,19 @@
             market: formData.get('market'),
             direction: formData.get('direction')
           };
-          if (!payload.title || !payload.description || !payload.date || !payload.time || !payload.status || !payload.market || !payload.direction) return alert('Please fill all fields');
+          if(!payload.title || !payload.description || !payload.date || !payload.time || !payload.status || !payload.market || !payload.direction) return alert('Please fill all fields');
           const r = await fetch(`/api/memos/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(payload)
+            method:'PUT',
+            headers:{'Content-Type':'application/json'},
+            body:JSON.stringify(payload)
           });
-          if (r.ok) loadAll();
-          else {
-            const j = await r.json().catch(()=>({}));
-            alert('Update failed: ' + (j.message || r.statusText));
-          }
+          if(r.ok) loadAll(); else { const j=await r.json().catch(()=>({})); alert('Update failed: '+(j.message||r.statusText)); }
         });
       });
     }
 
-    // helpers
-    function escapeHtml(s) { if(s==null)return''; return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
-    function escapeAttr(s){ if(s==null)return''; return String(s).replace(/"/g,'&quot;'); }
-    function nl2br(s){ return s.replace(/\n/g,'<br/>'); }
-
-    // Add memo
-    form.addEventListener('submit', async e => {
+    // Add memo form submit
+    form.addEventListener('submit', async e=>{
       e.preventDefault();
       const payload = {
         title: document.getElementById('title').value.trim(),
@@ -289,31 +265,17 @@
         direction: document.getElementById('direction').value,
         market: document.getElementById('market').value
       };
-      if (!payload.title || !payload.description || !payload.date || !payload.time || !payload.status || !payload.direction || !payload.market) return alert('Please fill all fields.');
-      const r = await fetch('/api/memos', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      if(!payload.title || !payload.description || !payload.date || !payload.time || !payload.status || !payload.direction || !payload.market) return alert('Please fill all fields.');
+      const r = await fetch('/api/memos',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify(payload)
       });
-      if (r.ok) {
-        form.reset();
-        loadAll();
-      } else {
-        const j = await r.json().catch(()=>({}));
-        alert('Failed to add memo: ' + (j.message||r.statusText));
-      }
+      if(r.ok){ form.reset(); loadAll(); } else { const j=await r.json().catch(()=>({})); alert('Failed to add memo: '+(j.message||r.statusText)); }
     });
 
-    // Logout button
-    document.getElementById('logoutBtn').addEventListener('click', async ()=>{
-      await fetch('/api/logout', { method:'POST' });
-      window.location.href='login.html';
-    });
-
-    loadAll().catch(err=>{
-      console.error(err);
-      document.getElementById('memosContainer').innerHTML = '<p class="muted">Failed to load memos.</p>';
-    });
+    // initial load
+    loadAll().catch(err=>{console.error(err); memosContainer.innerHTML='<p class="muted">Failed to load memos.</p>'; });
   </script>
 </body>
 </html>
