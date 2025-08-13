@@ -1,116 +1,97 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <title>Market Memos Dashboard</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AMML Memo Dashboard - Market Statistics</title>
+  <link rel="stylesheet" href="style.css">
   <style>
-    /* Additional inline styles for markets page */
-    body {
-      font-family: Arial, sans-serif;
-      background: #eef2f7;
-      margin: 30px;
-      color: #222;
-    }
-    h1 {
-      text-align: center;
-      margin-bottom: 20px;
-      color: #444;
-    }
-    table {
-      width: 100%;
-      max-width: 900px;
-      margin: 0 auto;
-      border-collapse: collapse;
-      background: #fff;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      border-radius: 8px;
-      overflow: hidden;
-    }
-    th, td {
-      padding: 14px 20px;
-      border-bottom: 1px solid #ddd;
-      text-align: center;
-      font-weight: 600;
-    }
-    th {
-      background-color: #1976d2;
-      color: white;
-      font-size: 1.1em;
-    }
-    tr:hover {
-      background-color: #f1f9ff;
-    }
-    .status-approved {
-      color: green;
-      font-weight: bold;
-    }
-    .status-pending {
-      color: orange;
-      font-weight: bold;
-    }
-    .nav-btn {
-      display: block;
-      width: 180px;
-      margin: 20px auto 40px auto;
-      padding: 12px 0;
-      background-color: #1976d2;
-      color: white;
-      font-weight: bold;
-      text-align: center;
-      border-radius: 6px;
-      text-decoration: none;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.15);
-      transition: background-color 0.3s ease;
-    }
-    .nav-btn:hover {
-      background-color: #1565c0;
-    }
+    .market-page { max-width: 1000px; margin: 28px auto; padding: 12px; }
+    h1 { text-align: center; color: #224abe; margin-bottom: 18px; }
+    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+    th, td { padding: 12px; border-bottom: 1px solid #eee; text-align: center; }
+    th { background: #4e73df; color: white; font-weight: 600; }
+    td.approved { color: #28a745; font-weight: 600; }
+    td.pending { color: #dc3545; font-weight: 600; }
+    td.incoming { color: #1976d2; font-weight: 600; }
+    td.outgoing { color: #ff9900; font-weight: 600; }
+    .back-btn { display: inline-block; margin-top: 20px; padding: 10px 16px; background: #4e73df; color: white; border-radius: 8px; text-decoration: none; font-weight: 600; }
+    .back-btn:hover { background: #224abe; }
   </style>
 </head>
 <body>
-
-  <h1>📊 Memos by Market</h1>
-
-  <a href="/" class="nav-btn">← Back to Main Dashboard</a>
-
-  <table id="marketTable">
-    <thead>
-      <tr>
-        <th>Market</th>
-        <th>Total Memos</th>
-        <th class="status-approved">Approved</th>
-        <th class="status-pending">Pending</th>
-      </tr>
-    </thead>
-    <tbody>
-      <!-- Data loads here -->
-    </tbody>
-  </table>
+  <div class="market-page">
+    <h1>📍 Market Memo Statistics</h1>
+    <table id="marketTable">
+      <thead>
+        <tr>
+          <th>Market</th>
+          <th>Total</th>
+          <th>Approved</th>
+          <th>Pending</th>
+          <th>Incoming</th>
+          <th>Outgoing</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Market rows will be injected here -->
+      </tbody>
+    </table>
+    <a href="index.html" class="back-btn">← Back to Dashboard</a>
+  </div>
 
   <script>
-    async function loadMarketData() {
-      const res = await fetch('/api/markets/counts');
-      const data = await res.json();
+    const MARKETS = [
+      "Apo ZoneA",
+      "Area1 shopping complex",
+      "Area 2 shopping complex",
+      "Area 10 market",
+      "Area 3 market",
+      "Dei Dei Markets",
+      "Garki International Market",
+      "Garki Model Market",
+      "Gudu Market",
+      "Head Office",
+      "Kado Fish Market",
+      "Kaura Market",
+      "Maitama Farmers Market",
+      "Wuse Market",
+      "Zone 3 neighnourhood center"
+    ];
+
+    async function loadMarketStats() {
+      const res = await fetch('/api/memos');
+      if (!res.ok) return alert('Failed to load memos.');
+      const memos = await res.json();
 
       const tbody = document.querySelector('#marketTable tbody');
       tbody.innerHTML = '';
 
-      for (const [market, counts] of Object.entries(data)) {
+      MARKETS.forEach(market => {
+        const arr = memos.filter(m => m.market === market);
+        const approved = arr.filter(m => m.status === 'Approved').length;
+        const pending = arr.filter(m => m.status === 'Pending').length;
+        const incoming = arr.filter(m => m.direction === 'Incoming').length;
+        const outgoing = arr.filter(m => m.direction === 'Outgoing').length;
+
         const row = document.createElement('tr');
         row.innerHTML = `
           <td>${market}</td>
-          <td>${counts.total}</td>
-          <td class="status-approved">${counts.approved}</td>
-          <td class="status-pending">${counts.pending}</td>
+          <td>${arr.length}</td>
+          <td class="approved">${approved}</td>
+          <td class="pending">${pending}</td>
+          <td class="incoming">${incoming}</td>
+          <td class="outgoing">${outgoing}</td>
         `;
         tbody.appendChild(row);
-      }
+      });
     }
 
-    loadMarketData();
-  </script>
+    // check for session
+    const sessionId = localStorage.getItem('sessionId');
+    if (!sessionId) window.location.href = 'login.html';
 
+    loadMarketStats();
+  </script>
 </body>
 </html>
